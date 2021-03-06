@@ -6,7 +6,7 @@ from MCTS_rave import *
 from chess_game import *
 
 n_game = 1
-n_mcts_iter = 500
+n_mcts_iter = 2000
 
 def play_game():
 
@@ -17,12 +17,12 @@ def play_game():
 		for k in range(n_mcts_iter):
 			reset_state()
 			MCTS()
-		print(f"MCTS\tlast_move\tnbr iter {n_mcts_iter}", file=sys.stderr, flush=True)
+		print(f"MCTS {mctsrd.board.fullmove_number}\tlast_move\tnbr iter {n_mcts_iter}", file=sys.stderr, flush=True)
 
 		reset_state()
 		print_best_move()
 
-		if mctsrd.board.is_game_over():
+		if mctsrd.board.is_game_over(claim_draw=True):
 			result = mctsrd.board.result()
 			print(f"Result: {result}")
 			return result.split('-'), (chess.WHITE if result[:1] == "1-" else (chess.BLACK if result[:1] == "0-" else None))

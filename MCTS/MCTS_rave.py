@@ -65,16 +65,25 @@ def simulation():
 
 	# Draw case
 	if not moves:
-		# print(f"SIMULATION END DRAW")
+		print(f"SIMULATION END NO POSSIBLE MOVES")
+		exit(0)
 		return 0
 
 	# Select one randomly
 	move = random.choice(moves)[1]
-	
+
 	# Apply move
 	apply_move(state, move)
 
-	return 1 if state.is_game_over() else simulation()
+	if state.is_game_over(claim_draw=True):
+		return 1 if state.is_checkmate() else 0
+
+	elif state.fullmove_number == 5:
+		return 420
+
+	else:
+		return -simulation()
+
 
 # --- Monte Carlo Tree Search (Rave optimisation) ---
 def MCTS(depth=0):
@@ -84,60 +93,64 @@ def MCTS(depth=0):
 
 	# moves: [(fen, move0), ..., (fen, moveN)]
 	moves = get_moves_id(state, fen)
-	# print(f"Moves:\n{moves}")
-	# print(f"Move 0: {str(moves[0])} type {type(moves[0])}")
 
-	# At least 1 move exist ?
-	if moves:
+	# Node already exist ? -> Go deeper
+	if fen in Ns:
 
-		# Node already exist ? -> Go deeper
-		if fen in Ns:
+		# - SELECTION
+		best_move_id, best_move = select_best_move_id(fen, moves)
 
-			# - SELECTION
-			best_move_id, best_move = select_best_move_id(fen, moves)
+		apply_move(state, best_move)
 
-			apply_move(state, best_move)
-
-			points = 1 if state.is_game_over() else MCTS(depth + 1)
-			# print(f"BACKPROPAGATION depth {depth} / points {points}")
-			
-			# --- BACKPROPAGATION ---
-			Ns[fen] += 1
-			Nsa[best_move_id] += 1
-			Pmcts[best_move_id] += points
-			Qmcts[best_move_id] = Pmcts[best_move_id] / Nsa[best_move_id]
-			return -points
-
-		# -> Leaf node
+		if state.is_game_over(claim_draw=True):
+			points = 1 if state.is_checkmate() else 0
 		else:
-			# print(f"if False")
+			points = MCTS(depth + 1)
 
-			# - EXPENSION
-			expansion(fen, moves)
+		# print(f"BACKPROPAGATION depth {depth} / points {points}")
+		
+		# --- BACKPROPAGATION ---
+		Ns[fen] += 1
+		Nsa[best_move_id] += 1
+		Pmcts[best_move_id] += points
+		Qmcts[best_move_id] = Pmcts[best_move_id] / Nsa[best_move_id]
+		return -points
 
-			# print(f"SIMULATION ->")
-
-			# - SIMULATION / CNN
-			return -heuristic(state)
-
-	# -> Draw
+	# -> Leaf node
 	else:
-		return 0
+		# print(f"if False")
+
+		# - EXPENSION
+		expansion(fen, moves)
+
+		# print(f"SIMULATION ->")
+
+		# - SIMULATION / CNN
+		return -heuristic(state)
+
+		# points = heuristic(state)
+		# # print(f"Heuristic of player {'WHITE' if state.turn else 'BLACK'} for this board -> {points}")
+		# # print_board(state)
+		# mat = simulation()
+		# if abs(mat) == 420:
+		# 	return -points
+		# else:
+		# 	return -mat
 
 
 
 
 # ----- MAIN FUNCTIONS -----
-
 def print_best_move():
 	
 	moves = get_moves_id(board, board.fen())
 
 	best_move = None
 	best_value = -1000000
+	print(f"Nmoves: {len(moves)}")
 	for Nsaid in moves:
 
-		print(f"Possible move -> {Nsaid[1]}: {Qmcts[Nsaid]}\t= {Pmcts[Nsaid]}\t/ {Nsa[Nsaid]}")
+		print(f"Possible move -> {Nsaid[1]}:\t{round(Qmcts[Nsaid], 4)}\t= {round(Pmcts[Nsaid], 4)}\t/ {Nsa[Nsaid]}")
 
 		if Qmcts[Nsaid] > best_value:
 			best_move = Nsaid[1]
