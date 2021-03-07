@@ -1,6 +1,7 @@
 import chess
 import chess.svg
 from chessboard import display
+import math
 
 piece_values = [(chess.PAWN, 1.0),
 				(chess.KNIGHT, 3.2),
@@ -18,7 +19,11 @@ def print_board(board):
 	print(f"Board:\n{board}")
 	display.start(board.fen())
 
-def heuristic(state):
+def max_points(turn, n_moves):
+	# return math.sqrt(turn) * n_moves
+	return math.sqrt(n_moves) * 10
+
+def heuristic(state, n_moves):
 
 	baseBoard = chess.BaseBoard(state.fen().split()[0])
 
@@ -32,7 +37,12 @@ def heuristic(state):
 		my_score += len(baseBoard.pieces(pieceType, my_color)) * value
 		opponent_score += len(baseBoard.pieces(pieceType, opponent_color)) * value
 
+	if state.is_check():
+		opponent_score *= 1.05
+
 	if my_score > opponent_score:
-		return 1 - opponent_score / my_score
+		points = 1 - opponent_score / my_score
 	else:
-		return my_score / opponent_score - 1
+		points = my_score / opponent_score - 1
+
+	return points * max_points(state.fullmove_number, n_moves)

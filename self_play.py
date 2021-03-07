@@ -5,6 +5,8 @@ import MCTS_rave as mctsrd
 from MCTS_rave import *
 from chess_game import *
 
+import time
+
 n_game = 1
 n_mcts_iter = 2000
 
@@ -14,10 +16,14 @@ def play_game():
 
 	while True:
 
-		for k in range(n_mcts_iter):
+		i = 0
+		begin_time = time.time()
+		# for k in range(n_mcts_iter):
+		while time.time() - begin_time < 3:
 			reset_state()
 			MCTS()
-		print(f"MCTS {mctsrd.board.fullmove_number}\tlast_move\tnbr iter {n_mcts_iter}", file=sys.stderr, flush=True)
+			i += 1
+		print(f"MCTS turn {mctsrd.board.fullmove_number}\tnbr iter {i}\tw = {math.sqrt(len(list(mctsrd.board.legal_moves))) * 10}", file=sys.stderr, flush=True)
 
 		reset_state()
 		print_best_move()

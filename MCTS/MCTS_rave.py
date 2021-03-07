@@ -103,9 +103,9 @@ def MCTS(depth=0):
 		apply_move(state, best_move)
 
 		if state.is_game_over(claim_draw=True):
-			points = 1 if state.is_checkmate() else 0
+			points = max_points(state.fullmove_number, len(moves)) if state.is_checkmate() else 0
 		else:
-			points = MCTS(depth + 1)
+			points = MCTS(depth + 1) * 1.1
 
 		# print(f"BACKPROPAGATION depth {depth} / points {points}")
 		
@@ -126,17 +126,7 @@ def MCTS(depth=0):
 		# print(f"SIMULATION ->")
 
 		# - SIMULATION / CNN
-		return -heuristic(state)
-
-		# points = heuristic(state)
-		# # print(f"Heuristic of player {'WHITE' if state.turn else 'BLACK'} for this board -> {points}")
-		# # print_board(state)
-		# mat = simulation()
-		# if abs(mat) == 420:
-		# 	return -points
-		# else:
-		# 	return -mat
-
+		return -heuristic(state, len(moves))
 
 
 
@@ -150,7 +140,7 @@ def print_best_move():
 	print(f"Nmoves: {len(moves)}")
 	for Nsaid in moves:
 
-		print(f"Possible move -> {Nsaid[1]}:\t{round(Qmcts[Nsaid], 4)}\t= {round(Pmcts[Nsaid], 4)}\t/ {Nsa[Nsaid]}")
+		print(f"Possible move -> {Nsaid[1]}:\t{round(Qmcts[Nsaid], 3)}\t= {round(Pmcts[Nsaid], 3)}\t/ {Nsa[Nsaid]}")
 
 		if Qmcts[Nsaid] > best_value:
 			best_move = Nsaid[1]
