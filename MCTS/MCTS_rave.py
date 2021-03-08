@@ -103,9 +103,10 @@ def MCTS(depth=0):
 		apply_move(state, best_move)
 
 		if state.is_game_over(claim_draw=True):
-			points = max_points(state.fullmove_number, len(moves)) if state.is_checkmate() else 0
+			# points = max_points(state.fullmove_number, len(moves)) if state.is_checkmate() else 0
+			points = 75 / state.fullmove_number if state.is_checkmate() else 0
 		else:
-			points = MCTS(depth + 1) * 1.1
+			points = MCTS(depth + 1)
 
 		# print(f"BACKPROPAGATION depth {depth} / points {points}")
 		

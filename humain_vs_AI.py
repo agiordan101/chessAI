@@ -16,10 +16,18 @@ def play_game():
 
 	while True:
 
+		move = input()
+		apply_move(mctsrd.board, move)
+
+		if mctsrd.board.is_game_over(claim_draw=True):
+			result = mctsrd.board.result()
+			print(f"Result: {result}")
+			return result.split('-'), (chess.WHITE if result[:1] == "1-" else (chess.BLACK if result[:1] == "0-" else None))
+
 		i = 0
 		begin_time = time.time()
-		# for k in range(n_mcts_iter):
-		while time.time() - begin_time < 3:
+		for k in range(n_mcts_iter):
+		# while time.time() - begin_time < 3:
 			reset_state()
 			MCTS()
 			i += 1
@@ -35,8 +43,8 @@ def play_game():
 
 print(f"Winners: {play_game()[1]}")
 
-while True:
-	print_board(mctsrd.board)
+# while True:
+# 	print_board(mctsrd.board)
 
 # winners = []
 # points = [0, 0]

@@ -37,12 +37,10 @@ def heuristic(state, n_moves):
 		my_score += len(baseBoard.pieces(pieceType, my_color)) * value
 		opponent_score += len(baseBoard.pieces(pieceType, opponent_color)) * value
 
-	if state.is_check():
-		opponent_score *= 1.05
-
 	if my_score > opponent_score:
 		points = 1 - opponent_score / my_score
 	else:
 		points = my_score / opponent_score - 1
 
-	return points * max_points(state.fullmove_number, n_moves)
+	return points
+	# return points * max_points(state.fullmove_number, n_moves)

@@ -18,8 +18,8 @@ def play_game():
 
 		i = 0
 		begin_time = time.time()
-		# for k in range(n_mcts_iter):
-		while time.time() - begin_time < 3:
+		for k in range(n_mcts_iter):
+		# while time.time() - begin_time < 3:
 			reset_state()
 			MCTS()
 			i += 1
